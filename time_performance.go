@@ -134,7 +134,7 @@ func main() {
 	g := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc, groupaffinityFunc: groupaffinityFunc}
 
 	results := g.calculate()
-	fmt.Println(results["n1"]["n18"], results["n18"]["n1"])
+	fmt.Println("[n1][n18]", results["n1"]["n18"], "[n18][n1]", results["n18"]["n1"])
 
 	endTime := time.Now()
 	fmt.Println("ElapsedTime in seconds:", endTime.Sub(startTime))

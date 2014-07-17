@@ -21,7 +21,7 @@ type Graffinity struct {
 
 func (g Graffinity) calculate() map[string]map[string]map[string]float32 {
 
-	nodenames, funcs, affinityFunc, _, f := g.init()
+	nodenames, funcs, affinityFunc, _, f, _ := g.init()
 
 	t1 := time.Now()
 
@@ -64,7 +64,6 @@ func (g Graffinity) calculate() map[string]map[string]map[string]float32 {
 			calculateFuncs[n1][n2]["total"] = affinityFunc(calculateFuncs[n1][n2])
 		}
 	}
-
 	t4 := time.Now()
 	fmt.Println("ElapsedTime in seconds:", t4.Sub(t3))
 	return calculateFuncs
@@ -140,14 +139,12 @@ func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graf
 
 func (g Graffinity) calculatefornode(nodename string) map[string]map[string]map[string]float32 {
 
-	nodenames, funcs, affinityFunc, _, f := g.init()
+	nodenames, funcs, affinityFunc, _, f, mynodedata := g.init(nodename)
 
 	t1 := time.Now()
 
-	mynode := nodename
-
 	var calculateFuncs = make(map[string]map[string]map[string]float32)
-	calculateFuncs[mynode] = make(map[string]map[string]float32)
+	calculateFuncs[nodename] = make(map[string]map[string]float32)
 	for _, n2 := range nodenames {
 		calculateFuncs[nodename][n2] = make(map[string]float32)
 		for namefunc, _ := range funcs {
@@ -166,7 +163,7 @@ func (g Graffinity) calculatefornode(nodename string) map[string]map[string]map[
 		ch := make(chan int)
 		channels[namefunc] = ch
 		funcdef := funcs[namefunc]
-		go calculateisolatedfuncfornode(namefunc, mynode, datafunc, funcdef, &calculateFuncs, ch)
+		go calculateisolatedfuncfornode(namefunc, nodename, mynodedata, datafunc, funcdef, &calculateFuncs, ch)
 		fmt.Println("Launching", namefunc)
 	}
 
@@ -180,7 +177,7 @@ func (g Graffinity) calculatefornode(nodename string) map[string]map[string]map[
 	fmt.Println("ElapsedTime in seconds:", t3.Sub(t2))
 
 	for _, n2 := range nodenames {
-		calculateFuncs[mynode][n2]["total"] = affinityFunc(calculateFuncs[mynode][n2])
+		calculateFuncs[nodename][n2]["total"] = affinityFunc(calculateFuncs[nodename][n2])
 
 	}
 
@@ -189,20 +186,20 @@ func (g Graffinity) calculatefornode(nodename string) map[string]map[string]map[
 	return calculateFuncs
 }
 
-func calculateisolatedfuncfornode(namefunc string, anode string, datafunc []NodeAndData, funcdef graffinityfunc, calculatedIsalotatedFuncsRef *map[string]map[string]map[string]float32, ch chan int) {
+func calculateisolatedfuncfornode(namefunc string, anodename string, anodedata map[string][]float32, datafunc []NodeAndData, funcdef graffinityfunc, calculatedIsalotatedFuncsRef *map[string]map[string]map[string]float32, ch chan int) {
 	calculateFuncs := *calculatedIsalotatedFuncsRef
 
-	anodeanddata := NodeAndData{"n1", []float32{33}}
+	anodeanddata := NodeAndData{anodename, anodedata[namefunc]}
 	for i := 0; i < len(datafunc); i++ {
 		n1 := anodeanddata
 		n2 := datafunc[i]
 		val := funcdef(append(n1.data, n2.data...))
-		calculateFuncs[anode][n2.name][namefunc] = val
+		calculateFuncs[n1.name][n2.name][namefunc] = val
 	}
 	ch <- 1
 }
 
-func (g Graffinity) init() ([]string, map[string]func([]float32) float32, func(map[string]float32) float32, func(map[string]float32) float32, map[string][]NodeAndData) {
+func (g Graffinity) init(optionalnode ...string) ([]string, map[string]func([]float32) float32, func(map[string]float32) float32, func(map[string]float32) float32, map[string][]NodeAndData, map[string][]float32) {
 
 	runtime.GOMAXPROCS(len(g.funcs))
 	//runtime.GOMAXPROCS(1)
@@ -226,7 +223,13 @@ func (g Graffinity) init() ([]string, map[string]func([]float32) float32, func(m
 		nodenames = append(nodenames, n)
 	}
 
-	return nodenames, funcs, affinityFunc, groupaffinityFunc, f
+	var anode map[string][]float32
+	if len(optionalnode) == 1 {
+		var anode map[string][]float32
+		anode = g.data[optionalnode[0]]
+		return nodenames, funcs, affinityFunc, groupaffinityFunc, f, anode
+	}
+	return nodenames, funcs, affinityFunc, groupaffinityFunc, f, anode
 
 }
 
