@@ -3,6 +3,7 @@ package main
 
 import "testing"
 import "math"
+import "fmt"
 
 func TestBasicCalculation(t *testing.T) {
 	data := map[string]map[string][]float64{
@@ -54,4 +55,6 @@ func TestBasicCalculation(t *testing.T) {
 	if results["n2"]["n3"]["total"] != 4.517241379310345 {
 		t.Error("n2 n3 Expected 4.517241379310345, got ", results["n2"]["n3"]["total"])
 	}
+	results2 := g.calculatefornode("n1")
+	fmt.Println(results2)
 }

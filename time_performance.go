@@ -131,10 +131,18 @@ func main() {
 	*/
 
 	g := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc}
+
 	results := g.calculate()
 	fmt.Println(results["n1"]["n18"], results["n18"]["n1"])
 
 	endTime := time.Now()
 	fmt.Println("ElapsedTime in seconds:", endTime.Sub(startTime))
 
+	startTime2 := time.Now()
+	fmt.Println("ElapsedTime in seconds:", startTime2.Sub(endTime))
+	fmt.Println("Launching for node n1")
+	g.calculatefornode("n1")
+
+	endTime2 := time.Now()
+	fmt.Println("ElapsedTime in seconds:", endTime2.Sub(startTime2))
 }
