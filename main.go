@@ -1,9 +1,6 @@
 // graffinity project main.go
 package main
 
-import "fmt"
-
-
 type graffinityfunc func(x []float64) float64
 
 type NodeAndData struct {
@@ -11,21 +8,18 @@ type NodeAndData struct {
 	data []float64
 }
 
-
 type Graffinity struct {
 	data              map[string]map[string][]float64
 	funcs             map[string]func([]float64) float64
-	affinityFunc      string
+	affinityFunc      func(map[string]float64) float64
 	groupaffinityFunc string
 }
 
 func (g Graffinity) calculate() map[string]map[string]float64 {
 
-
 	var data = g.data
 	var funcs = g.funcs
 	var affinityFunc = g.affinityFunc
-	fmt.Println(affinityFunc)
 
 	var f = make(map[string][]NodeAndData)
 
@@ -41,63 +35,50 @@ func (g Graffinity) calculate() map[string]map[string]float64 {
 		nodenames = append(nodenames, n)
 	}
 
-	var matrix = make(map[string]map[string]float64)
+	calculatedIsalotatedFuncs := make(map[string]map[string]map[string]float64)
+	for namefunc, datafunc := range f {
+		funcdef := funcs[namefunc]
+		valIsolatedFund := calculateisolatedfunc(namefunc, datafunc, funcdef)
+		calculatedIsalotatedFuncs[namefunc] = valIsolatedFund
+	}
+
+	var ret = make(map[string]map[string]float64)
 	for i := 0; i < len(nodenames); i++ {
 		nodename := nodenames[i]
 		n := map[string]float64{
 			nodename: 0.0,
 		}
-		matrix[nodename] = n
+		ret[nodename] = n
 		for i := 0; i < len(nodenames); i++ {
 			othernodename := nodenames[i]
-			matrix[nodename][othernodename] = 0.0
+			funcValues := make(map[string]float64)
+			for funcName, _ := range funcs {
+				funcValues[funcName] = calculatedIsalotatedFuncs[funcName][nodename][othernodename]
+			}
+			ret[nodename][othernodename] = affinityFunc(funcValues)
 		}
 	}
 
-	fmt.Println(len(f))
-	fmt.Println(len(matrix))
-
-	// end of equivalent of python's constructor
-
-
-	for namefunc, datafunc := range f {
-		funcdef := funcs[namefunc]
-		fmt.Println(funcdef)
-		fmt.Println(calculateisolatedfunc(namefunc, datafunc, funcdef))
-
-	}
-
-
-	ret := map[string]map[string]float64{
-		"n1": {
-			"n1": 33.0,
-			"n2": 33.0,
-		},
-		"n2": {
-			"n1": 33.0,
-			"n2": 33.0,
-			"n3": 33.0,
-		},
-	}
 	return ret
 }
 
-
-func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graffinityfunc) string {
-
-	a := "calculateisolatedfunc()"
-	fmt.Println(namefunc)
-	fmt.Println(datafunc)
-
+func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graffinityfunc) map[string]map[string]float64 {
 	var nodenames = make([]string, len(datafunc))
 	var nodedata = make([]float64, len(datafunc))
 
 	for _, data := range datafunc {
-
 		nodenames = append(nodenames, data.name)
 		nodedata = append(nodedata, data.data...)
 	}
-	fmt.Println(funcdef(nodedata))
-	return a
-}
 
+	ret := make(map[string]map[string]float64)
+	for _, n1 := range datafunc {
+		ret[n1.name] = make(map[string]float64)
+		for _, n2 := range datafunc {
+			values := append(n1.data, n2.data...)
+			ret[n1.name][n2.name] = funcdef(values)
+		}
+
+	}
+	return ret
+}

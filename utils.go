@@ -30,7 +30,7 @@ func newRsdv() func(float64) float64 {
 func Stdev(v []float64) (m float64) {
 	r := newRsdv()
 	var result float64
-	for _, x := range []float64{2, 4, 4, 4, 5, 5, 7, 9} {
+	for _, x := range v {
 		result = r(x)
 	}
 	return result
@@ -93,13 +93,13 @@ func Range(args ...int) []float64 {
 }
 
 func Choice(arr []float64) float64 {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(int64(time.Now().Nanosecond()))
 	pos := rand.Intn(len(arr))
 	return arr[pos]
 }
 
 func Sample(arr []float64, quantity int) []float64 {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(int64(time.Now().Nanosecond()))
 	ret := make([]float64, quantity)
 	for i := 0; i < quantity; i++ {
 		ret[i] = arr[rand.Intn(len(arr))]
@@ -108,6 +108,6 @@ func Sample(arr []float64, quantity int) []float64 {
 }
 
 func RandInt(min, max int) int {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(int64(time.Now().Nanosecond()))
 	return rand.Intn(max-min) + min
 }

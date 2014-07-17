@@ -30,7 +30,8 @@ func datagenerator(n int) map[string]map[string][]float64 {
 	data := map[string]map[string][]float64{}
 
 	for i := 1; i < n; i++ {
-		data["n"+string(i)] = map[string][]float64{
+		name := fmt.Sprintf("n%d", i)
+		data[name] = map[string][]float64{
 			"gender":         []float64{Choice(genderchoices)},
 			"age":            []float64{Choice(agechoices)},
 			"languages":      Sample(languageslist, 3),
@@ -110,12 +111,15 @@ func main() {
 		"guilds":         guildsFunc,
 	}
 
-	affinityFunc := `genderFunc(x) + ageFunc(x) + languagesFunc(x) + 
-	friendsFunc(x) + knowngamesFunc(x) + toplaywishlistFunc(x) + 
-	favouritegamesFunc(x) + preferencesFunc(x) + vetoesFunc(x) + 
-	gametypeFunc(x) + skill01Func(x) + skill02Func(x) + skill03Func(x) + 
-	skill04Func(x) + skill05Func(x) + skill06Func(x) + skill07Func(x) + 
-	skill08Func(x) + skill09Func(x) + skill10Func(x) + guildsFunc(x)`
+	affinityFunc := func(dictValues map[string]float64) float64 {
+		return dictValues["gender"] + dictValues["age"] + dictValues["languages"] +
+			dictValues["friends"] + dictValues["knowngames"] + dictValues["toplaywishlist"] +
+			dictValues["favouritegames"] + dictValues["preferences"] + dictValues["vetoes"] +
+			dictValues["gametype"] + dictValues["skill01"] + dictValues["skill02"] +
+			dictValues["skill03"] + dictValues["skill04"] + dictValues["skill05"] +
+			dictValues["skill06"] + dictValues["skill07"] + dictValues["skill08"] +
+			dictValues["skill09"] + dictValues["skill10"] + dictValues["guilds"]
+	}
 
 	/*
 		groupaffinityFunc := `genderFunc(x) + ageFunc(x) + languagesFunc(x) +
