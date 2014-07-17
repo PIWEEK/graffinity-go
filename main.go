@@ -1,6 +1,9 @@
 // graffinity project main.go
 package main
 
+import "runtime"
+import "fmt"
+
 type graffinityfunc func(x []float64) float64
 
 type NodeAndData struct {
@@ -16,6 +19,8 @@ type Graffinity struct {
 }
 
 func (g Graffinity) calculate() map[string]map[string]float64 {
+	runtime.GOMAXPROCS(len(g.funcs))
+	//runtime.GOMAXPROCS(1)
 
 	var data = g.data
 	var funcs = g.funcs
@@ -36,10 +41,21 @@ func (g Graffinity) calculate() map[string]map[string]float64 {
 	}
 
 	calculatedIsalotatedFuncs := make(map[string]map[string]map[string]float64)
+
+	var channels = make(map[string]chan map[string]map[string]float64, len(funcs))
+
 	for namefunc, datafunc := range f {
+		ch := make(chan map[string]map[string]float64)
+		channels[namefunc] = ch
 		funcdef := funcs[namefunc]
-		valIsolatedFund := calculateisolatedfunc(namefunc, datafunc, funcdef)
-		calculatedIsalotatedFuncs[namefunc] = valIsolatedFund
+		go calculateisolatedfunc(namefunc, datafunc, funcdef, ch)
+		fmt.Println("Launching", namefunc)
+	}
+
+	for funcName, channel := range channels {
+		calculatedIsalotatedFuncs[funcName] = <-channel
+		fmt.Println("Finishing", funcName)
+
 	}
 
 	var ret = make(map[string]map[string]float64)
@@ -62,7 +78,7 @@ func (g Graffinity) calculate() map[string]map[string]float64 {
 	return ret
 }
 
-func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graffinityfunc) map[string]map[string]float64 {
+func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graffinityfunc, ch chan map[string]map[string]float64) {
 	var nodenames = make([]string, len(datafunc))
 	var nodedata = make([]float64, len(datafunc))
 
@@ -80,5 +96,5 @@ func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graf
 		}
 
 	}
-	return ret
+	ch <- ret
 }
