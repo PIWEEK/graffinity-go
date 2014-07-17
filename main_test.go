@@ -43,18 +43,34 @@ func TestBasicCalculation(t *testing.T) {
 		return dictValues["gender"] + 3.5*dictValues["age"] + 0.1*dictValues["languages"]
 	}
 
-	g := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc}
-	results := g.calculate()
+	groupaffinityFunc := func(dictValues map[string]float32) float32 {
+		return dictValues["gender"] + 3.5*dictValues["age"] + 0.1*dictValues["languages"]
+	}
 
-	if results["n1"]["n2"]["total"] != 4.3478260869565215 {
-		t.Error("n1 n2 Expected 4.3478260869565215, got ", results["n1"]["n2"]["total"])
+	g := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc, groupaffinityFunc: groupaffinityFunc}
+	results := g.calculate()
+	fmt.Println("results", results["n1"])
+
+	if results["n1"]["n2"]["total"] != 4.347826 {
+		t.Error("n1 n2 Expected 4.347826, got ", results["n1"]["n2"]["total"])
 	}
-	if results["n2"]["n1"]["total"] != 4.3478260869565215 {
-		t.Error("n2 n1 Expected 4.3478260869565215, got ", results["n2"]["n1"]["total"])
+	if results["n2"]["n1"]["total"] != 4.347826 {
+		t.Error("n2 n1 Expected 4.347826, got ", results["n2"]["n1"]["total"])
 	}
-	if results["n2"]["n3"]["total"] != 4.517241379310345 {
-		t.Error("n2 n3 Expected 4.517241379310345, got ", results["n2"]["n3"]["total"])
+	if results["n2"]["n3"]["total"] != 4.5172415 {
+		t.Error("n2 n3 Expected 4.5172415, got ", results["n2"]["n3"]["total"])
 	}
+
 	results2 := g.calculatefornode("n1")
-	fmt.Println(results2)
+	fmt.Println("results2", results2["n1"])
+
+	if results2["n1"]["n2"]["total"] != 4.347826 {
+		t.Error("n1 n2 Expected 4.347826, got ", results2["n1"]["n2"]["total"])
+	}
+
+	results3 := g.calculateforgroup([]string{"n1", "n2", "n3"})
+	if results3 != 5.43242 {
+		t.Error("n1 n2 b3 group affinity Expected 5.43242, got ", results3)
+	}
+	fmt.Println("group affinity", results3)
 }

@@ -61,12 +61,12 @@ func datagenerator(n int) map[string]map[string][]float32 {
 
 func main() {
 	fmt.Println("Creating sample data")
-	data := datagenerator(2001)
+	data := datagenerator(101)
 
 	startTime := time.Now()
 
-	genderFunc := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
-	ageFunc := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	genderFunc := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	ageFunc := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
 	languagesFunc := func(x []float32) float32 { return 5. * float32(len(x)-len(RemoveDuplicates(x))) }
 	friendsFunc := func(x []float32) float32 { return 2.5 * float32(len(x)-len(RemoveDuplicates(x))) }
 	knowngamesFunc := func(x []float32) float32 { return 2.5 * float32((len(x)-len(RemoveDuplicates(x)))/len(x)) }
@@ -75,16 +75,16 @@ func main() {
 	preferencesFunc := func(x []float32) float32 { return 1. * float32(len(x)-len(RemoveDuplicates(x))) }
 	vetoesFunc := func(x []float32) float32 { return 1. * float32(len(x)-len(RemoveDuplicates(x))) }
 	gametypeFunc := func(x []float32) float32 { return 15. * float32((len(x)-len(RemoveDuplicates(x)))/len(x)) }
-	skill01Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
-	skill02Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
-	skill03Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
-	skill04Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
-	skill05Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
-	skill06Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
-	skill07Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
-	skill08Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
-	skill09Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
-	skill10Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	skill01Func := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	skill02Func := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	skill03Func := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	skill04Func := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	skill05Func := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	skill06Func := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	skill07Func := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	skill08Func := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	skill09Func := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	skill10Func := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
 	guildsFunc := func(x []float32) float32 { return 5. * float32((len(x)-len(RemoveDuplicates(x)))/len(x)) }
 
 	funcs := map[string]func([]float32) float32{
@@ -121,16 +121,17 @@ func main() {
 			dictValues["skill09"] + dictValues["skill10"] + dictValues["guilds"]
 	}
 
-	/*
-		groupaffinityFunc := `genderFunc(x) + ageFunc(x) + languagesFunc(x) +
-		friendsFunc(x) + knowngamesFunc(x) + toplaywishlistFunc(x) +
-		favouritegamesFunc(x) + preferencesFunc(x) + vetoesFunc(x) +
-		gametypeFunc(x) + skill01Func(x) + skill02Func(x) + skill03Func(x) +
-		skill04Func(x) + skill05Func(x) + skill06Func(x) + skill07Func(x) +
-		skill08Func(x) + skill09Func(x) + skill10Func(x) + guildsFunc(x)`
-	*/
+	groupaffinityFunc := func(dictValues map[string]float32) float32 {
+		return dictValues["gender"] + dictValues["age"] + dictValues["languages"] +
+			dictValues["friends"] + dictValues["knowngames"] + dictValues["toplaywishlist"] +
+			dictValues["favouritegames"] + dictValues["preferences"] + dictValues["vetoes"] +
+			dictValues["gametype"] + dictValues["skill01"] + dictValues["skill02"] +
+			dictValues["skill03"] + dictValues["skill04"] + dictValues["skill05"] +
+			dictValues["skill06"] + dictValues["skill07"] + dictValues["skill08"] +
+			dictValues["skill09"] + dictValues["skill10"] + dictValues["guilds"]
+	}
 
-	g := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc}
+	g := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc, groupaffinityFunc: groupaffinityFunc}
 
 	results := g.calculate()
 	fmt.Println(results["n1"]["n18"], results["n18"]["n1"])
@@ -140,9 +141,18 @@ func main() {
 
 	startTime2 := time.Now()
 	fmt.Println("ElapsedTime in seconds:", startTime2.Sub(endTime))
-	fmt.Println("Launching for node n1")
+	fmt.Println("---------------> Launching for node n1")
 	g.calculatefornode("n1")
 
 	endTime2 := time.Now()
 	fmt.Println("ElapsedTime in seconds:", endTime2.Sub(startTime2))
+
+	startTime3 := time.Now()
+	fmt.Println("ElapsedTime in seconds:", endTime2.Sub(endTime))
+	fmt.Println("----------------> Launching for group n1 n2 n3")
+	g.calculateforgroup([]string{"n1", "n2", "n3"})
+
+	endTime3 := time.Now()
+	fmt.Println("ElapsedTime in seconds:", endTime3.Sub(startTime3))
+
 }
