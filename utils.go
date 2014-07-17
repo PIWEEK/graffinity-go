@@ -23,7 +23,7 @@ func newRsdv() func(float32) float32 {
 		n++
 		a1 := a + (x-a)/n
 		q, a = q+(x-a)*(x-a1), a1
-		return float32( math.Sqrt(float64(q) / float64(n)))
+		return float32(math.Sqrt(float64(q) / float64(n)))
 	}
 }
 

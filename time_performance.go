@@ -3,6 +3,7 @@ package main
 import "fmt"
 import "math"
 import "time"
+import "runtime"
 
 var genderchoices = []float32{1, 2}
 var agechoices = Range(18, 70)
@@ -61,7 +62,7 @@ func datagenerator(n int) map[string]map[string][]float32 {
 
 func main() {
 	fmt.Println("Creating sample data")
-	data := datagenerator(101)
+	data := datagenerator(2001)
 
 	startTime := time.Now()
 
@@ -135,6 +136,11 @@ func main() {
 
 	results := g.calculate()
 	fmt.Println("[n1][n18]", results["n1"]["n18"], "[n18][n1]", results["n18"]["n1"])
+
+	memstats := new(runtime.MemStats)
+	runtime.ReadMemStats(memstats)
+	fmt.Println("memstats before GC: bytes =", memstats.HeapAlloc, "footprint =",
+		memstats.Sys)
 
 	endTime := time.Now()
 	fmt.Println("ElapsedTime in seconds:", endTime.Sub(startTime))

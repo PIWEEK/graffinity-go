@@ -19,6 +19,8 @@ type Graffinity struct {
 	groupaffinityFunc func(map[string]float32) float32
 }
 
+// calculate functions
+
 func (g Graffinity) calculate() map[string]map[string]map[string]float32 {
 
 	nodenames, funcs, affinityFunc, _, f, _ := g.init()
@@ -111,32 +113,6 @@ func (g Graffinity) calculateforgroup(nodegroup []string) float32 {
 
 }
 
-func calculateisolatedfuncforgroup(namefunc string, appendedlist []float32, funcdef graffinityfunc, calculatedIsalotatedFuncsForGroupRef *map[string]float32, ch chan int) {
-	calculateFuncs := *calculatedIsalotatedFuncsForGroupRef
-
-	val := funcdef(appendedlist)
-
-	calculateFuncs[namefunc] = val
-
-	ch <- 1
-
-}
-
-func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graffinityfunc, calculatedIsalotatedFuncsRef *map[string]map[string]map[string]float32, ch chan int) {
-	calculateFuncs := *calculatedIsalotatedFuncsRef
-
-	for i := 0; i < len(datafunc); i++ {
-		for j := i; j < len(datafunc); j++ {
-			n1 := datafunc[i]
-			n2 := datafunc[j]
-			val := funcdef(append(n1.data, n2.data...))
-			calculateFuncs[n1.name][n2.name][namefunc] = val
-			calculateFuncs[n2.name][n1.name][namefunc] = val
-		}
-	}
-	ch <- 1
-}
-
 func (g Graffinity) calculatefornode(nodename string) map[string]map[string]map[string]float32 {
 
 	nodenames, funcs, affinityFunc, _, f, mynodedata := g.init(nodename)
@@ -186,6 +162,34 @@ func (g Graffinity) calculatefornode(nodename string) map[string]map[string]map[
 	return calculateFuncs
 }
 
+// calculate isolatedfunc functions
+
+func calculateisolatedfuncforgroup(namefunc string, appendedlist []float32, funcdef graffinityfunc, calculatedIsalotatedFuncsForGroupRef *map[string]float32, ch chan int) {
+	calculateFuncs := *calculatedIsalotatedFuncsForGroupRef
+
+	val := funcdef(appendedlist)
+
+	calculateFuncs[namefunc] = val
+
+	ch <- 1
+
+}
+
+func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graffinityfunc, calculatedIsalotatedFuncsRef *map[string]map[string]map[string]float32, ch chan int) {
+	calculateFuncs := *calculatedIsalotatedFuncsRef
+
+	for i := 0; i < len(datafunc); i++ {
+		for j := i; j < len(datafunc); j++ {
+			n1 := datafunc[i]
+			n2 := datafunc[j]
+			val := funcdef(append(n1.data, n2.data...))
+			calculateFuncs[n1.name][n2.name][namefunc] = val
+			calculateFuncs[n2.name][n1.name][namefunc] = val
+		}
+	}
+	ch <- 1
+}
+
 func calculateisolatedfuncfornode(namefunc string, anodename string, anodedata map[string][]float32, datafunc []NodeAndData, funcdef graffinityfunc, calculatedIsalotatedFuncsRef *map[string]map[string]map[string]float32, ch chan int) {
 	calculateFuncs := *calculatedIsalotatedFuncsRef
 
@@ -198,6 +202,8 @@ func calculateisolatedfuncfornode(namefunc string, anodename string, anodedata m
 	}
 	ch <- 1
 }
+
+// init functions
 
 func (g Graffinity) init(optionalnode ...string) ([]string, map[string]func([]float32) float32, func(map[string]float32) float32, func(map[string]float32) float32, map[string][]NodeAndData, map[string][]float32) {
 

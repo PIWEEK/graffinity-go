@@ -4,6 +4,7 @@ package main
 import "testing"
 import "math"
 import "fmt"
+import "runtime"
 
 func TestBasicCalculation(t *testing.T) {
 	data := map[string]map[string][]float32{
@@ -73,4 +74,10 @@ func TestBasicCalculation(t *testing.T) {
 		t.Error("n1 n2 b3 group affinity Expected 5.43242, got ", results3)
 	}
 	fmt.Println("group affinity", results3)
+
+	memstats := new(runtime.MemStats)
+	runtime.ReadMemStats(memstats)
+	fmt.Println("memstats before GC: bytes = %d footprint = %d",
+		memstats.HeapAlloc, memstats.Sys)
+
 }
