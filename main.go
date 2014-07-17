@@ -20,28 +20,8 @@ type Graffinity struct {
 }
 
 func (g Graffinity) calculate() map[string]map[string]map[string]float64 {
-	runtime.GOMAXPROCS(len(g.funcs))
-	//runtime.GOMAXPROCS(1)
 
-	var data = g.data
-	var funcs = g.funcs
-	var affinityFunc = g.affinityFunc
-
-	var f = make(map[string][]NodeAndData)
-
-	for namefunc, _ := range funcs {
-		for nodename, nodedata := range data {
-			var nad = NodeAndData{nodename, nodedata[namefunc]}
-			f[namefunc] = append(f[namefunc], nad)
-		}
-	}
-
-	var nodenames []string
-	for n, _ := range data {
-		nodenames = append(nodenames, n)
-	}
-
-	t1 := time.Now()
+	nodenames, funcs, t1, affinityFunc, f := g.init()
 
 	var calculateFuncs = make(map[string]map[string]map[string]float64)
 	for _, n1 := range nodenames {
@@ -102,11 +82,10 @@ func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graf
 	ch <- 1
 }
 
-func (g Graffinity) calculatefornode(nodename string) map[string]map[string]map[string]float64 {
+func (g Graffinity) init() ([]string, map[string]func([]float64) float64, time.Time, func(map[string]float64) float64, map[string][]NodeAndData) {
+
 	runtime.GOMAXPROCS(len(g.funcs))
 	//runtime.GOMAXPROCS(1)
-
-	mynode := nodename
 
 	var data = g.data
 	var funcs = g.funcs
@@ -127,6 +106,16 @@ func (g Graffinity) calculatefornode(nodename string) map[string]map[string]map[
 	}
 
 	t1 := time.Now()
+
+	return nodenames, funcs, t1, affinityFunc, f
+
+}
+
+func (g Graffinity) calculatefornode(nodename string) map[string]map[string]map[string]float64 {
+
+	nodenames, funcs, t1, affinityFunc, f := g.init()
+
+	mynode := nodename
 
 	var calculateFuncs = make(map[string]map[string]map[string]float64)
 	calculateFuncs[mynode] = make(map[string]map[string]float64)
