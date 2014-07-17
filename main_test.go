@@ -29,8 +29,8 @@ func TestBasicCalculation(t *testing.T) {
 		},
 	}
 
-	genderFunc := func(x []float32) float32 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	ageFunc := func(x []float32) float32 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
+	genderFunc := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
+	ageFunc := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
 	languagesFunc := func(x []float32) float32 { return 5 * float32(len(x)-len(RemoveDuplicates(x))) }
 
 	funcs := map[string]func([]float32) float32{
