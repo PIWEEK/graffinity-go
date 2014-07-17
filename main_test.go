@@ -6,40 +6,40 @@ import "math"
 import "fmt"
 
 func TestBasicCalculation(t *testing.T) {
-	data := map[string]map[string][]float64{
+	data := map[string]map[string][]float32{
 		"n1": {
-			"gender":    []float64{0},
-			"age":       []float64{36},
-			"languages": []float64{2, 5, 6},
+			"gender":    []float32{0},
+			"age":       []float32{36},
+			"languages": []float32{2, 5, 6},
 		},
 		"n2": {
-			"gender":    []float64{1},
-			"age":       []float64{33},
-			"languages": []float64{2, 6},
+			"gender":    []float32{1},
+			"age":       []float32{33},
+			"languages": []float32{2, 6},
 		},
 		"n3": {
-			"gender":    []float64{1},
-			"age":       []float64{25},
-			"languages": []float64{1, 6, 9, 10},
+			"gender":    []float32{1},
+			"age":       []float32{25},
+			"languages": []float32{1, 6, 9, 10},
 		},
 		"n4": {
-			"gender":    []float64{1},
-			"age":       []float64{28},
-			"languages": []float64{1},
+			"gender":    []float32{1},
+			"age":       []float32{28},
+			"languages": []float32{1},
 		},
 	}
 
-	genderFunc := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	ageFunc := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	languagesFunc := func(x []float64) float64 { return 5 * float64(len(x)-len(RemoveDuplicates(x))) }
+	genderFunc := func(x []float32) float32 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
+	ageFunc := func(x []float32) float32 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
+	languagesFunc := func(x []float32) float32 { return 5 * float32(len(x)-len(RemoveDuplicates(x))) }
 
-	funcs := map[string]func([]float64) float64{
+	funcs := map[string]func([]float32) float32{
 		"gender":    genderFunc,
 		"age":       ageFunc,
 		"languages": languagesFunc,
 	}
 
-	affinityFunc := func(dictValues map[string]float64) float64 {
+	affinityFunc := func(dictValues map[string]float32) float32 {
 		return dictValues["gender"] + 3.5*dictValues["age"] + 0.1*dictValues["languages"]
 	}
 

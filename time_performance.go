@@ -4,7 +4,7 @@ import "fmt"
 import "math"
 import "time"
 
-var genderchoices = []float64{1, 2}
+var genderchoices = []float32{1, 2}
 var agechoices = Range(18, 70)
 var languageslist = Range(1, 20)
 var friendslist = Range(1, 10)
@@ -26,14 +26,14 @@ var skill09choices = skill01choices
 var skill10choices = skill01choices
 var guildslist = Range(1, 200)
 
-func datagenerator(n int) map[string]map[string][]float64 {
-	data := map[string]map[string][]float64{}
+func datagenerator(n int) map[string]map[string][]float32 {
+	data := map[string]map[string][]float32{}
 
 	for i := 1; i < n; i++ {
 		name := fmt.Sprintf("n%d", i)
-		data[name] = map[string][]float64{
-			"gender":         []float64{Choice(genderchoices)},
-			"age":            []float64{Choice(agechoices)},
+		data[name] = map[string][]float32{
+			"gender":         []float32{Choice(genderchoices)},
+			"age":            []float32{Choice(agechoices)},
 			"languages":      Sample(languageslist, 3),
 			"friends":        Sample(friendslist, RandInt(1, 5)),
 			"knowngames":     Sample(knowngameslist, RandInt(1, 20)),
@@ -42,16 +42,16 @@ func datagenerator(n int) map[string]map[string][]float64 {
 			"preferences":    Sample(preferenceslist, RandInt(1, 3)),
 			"vetoes":         Sample(vetoeslist, RandInt(1, 3)),
 			"gametype":       Sample(gametypelist, RandInt(1, 5)),
-			"skill01":        []float64{Choice(skill01choices)},
-			"skill02":        []float64{Choice(skill02choices)},
-			"skill03":        []float64{Choice(skill03choices)},
-			"skill04":        []float64{Choice(skill04choices)},
-			"skill05":        []float64{Choice(skill05choices)},
-			"skill06":        []float64{Choice(skill06choices)},
-			"skill07":        []float64{Choice(skill07choices)},
-			"skill08":        []float64{Choice(skill08choices)},
-			"skill09":        []float64{Choice(skill09choices)},
-			"skill10":        []float64{Choice(skill10choices)},
+			"skill01":        []float32{Choice(skill01choices)},
+			"skill02":        []float32{Choice(skill02choices)},
+			"skill03":        []float32{Choice(skill03choices)},
+			"skill04":        []float32{Choice(skill04choices)},
+			"skill05":        []float32{Choice(skill05choices)},
+			"skill06":        []float32{Choice(skill06choices)},
+			"skill07":        []float32{Choice(skill07choices)},
+			"skill08":        []float32{Choice(skill08choices)},
+			"skill09":        []float32{Choice(skill09choices)},
+			"skill10":        []float32{Choice(skill10choices)},
 			"guilds":         Sample(guildslist, RandInt(1, 5)),
 		}
 	}
@@ -61,33 +61,33 @@ func datagenerator(n int) map[string]map[string][]float64 {
 
 func main() {
 	fmt.Println("Creating sample data")
-	data := datagenerator(1001)
+	data := datagenerator(2001)
 
 	startTime := time.Now()
 
-	genderFunc := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	ageFunc := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	languagesFunc := func(x []float64) float64 { return 5. * float64(len(x)-len(RemoveDuplicates(x))) }
-	friendsFunc := func(x []float64) float64 { return 2.5 * float64(len(x)-len(RemoveDuplicates(x))) }
-	knowngamesFunc := func(x []float64) float64 { return 2.5 * float64((len(x)-len(RemoveDuplicates(x)))/len(x)) }
-	toplaywishlistFunc := func(x []float64) float64 { return 10. * float64((len(x)-len(RemoveDuplicates(x)))/len(x)) }
-	favouritegamesFunc := func(x []float64) float64 { return 20. * float64((len(x)-len(RemoveDuplicates(x)))/len(x)) }
-	preferencesFunc := func(x []float64) float64 { return 1. * float64(len(x)-len(RemoveDuplicates(x))) }
-	vetoesFunc := func(x []float64) float64 { return 1. * float64(len(x)-len(RemoveDuplicates(x))) }
-	gametypeFunc := func(x []float64) float64 { return 15. * float64((len(x)-len(RemoveDuplicates(x)))/len(x)) }
-	skill01Func := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	skill02Func := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	skill03Func := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	skill04Func := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	skill05Func := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	skill06Func := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	skill07Func := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	skill08Func := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	skill09Func := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	skill10Func := func(x []float64) float64 { return math.Abs(Mean(x)-Stdev(x)) / Mean(x) }
-	guildsFunc := func(x []float64) float64 { return 5. * float64((len(x)-len(RemoveDuplicates(x)))/len(x)) }
+	genderFunc := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	ageFunc := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	languagesFunc := func(x []float32) float32 { return 5. * float32(len(x)-len(RemoveDuplicates(x))) }
+	friendsFunc := func(x []float32) float32 { return 2.5 * float32(len(x)-len(RemoveDuplicates(x))) }
+	knowngamesFunc := func(x []float32) float32 { return 2.5 * float32((len(x)-len(RemoveDuplicates(x)))/len(x)) }
+	toplaywishlistFunc := func(x []float32) float32 { return 10. * float32((len(x)-len(RemoveDuplicates(x)))/len(x)) }
+	favouritegamesFunc := func(x []float32) float32 { return 20. * float32((len(x)-len(RemoveDuplicates(x)))/len(x)) }
+	preferencesFunc := func(x []float32) float32 { return 1. * float32(len(x)-len(RemoveDuplicates(x))) }
+	vetoesFunc := func(x []float32) float32 { return 1. * float32(len(x)-len(RemoveDuplicates(x))) }
+	gametypeFunc := func(x []float32) float32 { return 15. * float32((len(x)-len(RemoveDuplicates(x)))/len(x)) }
+	skill01Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	skill02Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	skill03Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	skill04Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	skill05Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	skill06Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	skill07Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	skill08Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	skill09Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	skill10Func := func(x []float32) float32 { return float32(math.Abs( float64 (Mean(x)-Stdev(x) ) )/ float64 (Mean(x))) }
+	guildsFunc := func(x []float32) float32 { return 5. * float32((len(x)-len(RemoveDuplicates(x)))/len(x)) }
 
-	funcs := map[string]func([]float64) float64{
+	funcs := map[string]func([]float32) float32{
 		"gender":         genderFunc,
 		"age":            ageFunc,
 		"languages":      languagesFunc,
@@ -111,7 +111,7 @@ func main() {
 		"guilds":         guildsFunc,
 	}
 
-	affinityFunc := func(dictValues map[string]float64) float64 {
+	affinityFunc := func(dictValues map[string]float32) float32 {
 		return dictValues["gender"] + dictValues["age"] + dictValues["languages"] +
 			dictValues["friends"] + dictValues["knowngames"] + dictValues["toplaywishlist"] +
 			dictValues["favouritegames"] + dictValues["preferences"] + dictValues["vetoes"] +

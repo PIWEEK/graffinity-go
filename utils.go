@@ -5,9 +5,9 @@ import "math"
 import "math/rand"
 import "time"
 
-func RemoveDuplicates(a []float64) []float64 {
-	result := []float64{}
-	seen := map[float64]float64{}
+func RemoveDuplicates(a []float32) []float32 {
+	result := []float32{}
+	seen := map[float32]float32{}
 	for _, val := range a {
 		if _, ok := seen[val]; !ok {
 			result = append(result, val)
@@ -17,35 +17,35 @@ func RemoveDuplicates(a []float64) []float64 {
 	return result
 }
 
-func newRsdv() func(float64) float64 {
-	var n, a, q float64
-	return func(x float64) float64 {
+func newRsdv() func(float32) float32 {
+	var n, a, q float32
+	return func(x float32) float32 {
 		n++
 		a1 := a + (x-a)/n
 		q, a = q+(x-a)*(x-a1), a1
-		return math.Sqrt(q / n)
+		return float32( math.Sqrt(float64(q) / float64(n)))
 	}
 }
 
-func Stdev(v []float64) (m float64) {
+func Stdev(v []float32) (m float32) {
 	r := newRsdv()
-	var result float64
+	var result float32
 	for _, x := range v {
 		result = r(x)
 	}
 	return result
 }
 
-func Mean(v []float64) (m float64) {
+func Mean(v []float32) (m float32) {
 	// an algorithm that attempts to retain accuracy
 	// with widely different values.
-	var parts []float64
+	var parts []float32
 	for _, x := range v {
 		var i int
 		for _, p := range parts {
 			sum := p + x
-			var err float64
-			switch ax, ap := math.Abs(x), math.Abs(p); {
+			var err float32
+			switch ax, ap := float32(math.Abs(float64(x))), float32(math.Abs(float64(p))); {
 			case ax < ap:
 				err = x - (sum - p)
 			case ap < ax:
@@ -59,14 +59,14 @@ func Mean(v []float64) (m float64) {
 		}
 		parts = append(parts[:i], x)
 	}
-	var sum float64
+	var sum float32
 	for _, x := range parts {
 		sum += x
 	}
-	return sum / float64(len(v))
+	return sum / float32(len(v))
 }
 
-func Range(args ...int) []float64 {
+func Range(args ...int) []float32 {
 	nargs := len(args)
 	start, stop, stride := 0, 0, 0
 	switch nargs {
@@ -85,22 +85,22 @@ func Range(args ...int) []float64 {
 	default:
 		panic("boo")
 	}
-	out := []float64{}
+	out := []float32{}
 	for i := start; i < stop; i += stride {
-		out = append(out, float64(i))
+		out = append(out, float32(i))
 	}
 	return out
 }
 
-func Choice(arr []float64) float64 {
+func Choice(arr []float32) float32 {
 	rand.Seed(int64(time.Now().Nanosecond()))
 	pos := rand.Intn(len(arr))
 	return arr[pos]
 }
 
-func Sample(arr []float64, quantity int) []float64 {
+func Sample(arr []float32, quantity int) []float32 {
 	rand.Seed(int64(time.Now().Nanosecond()))
-	ret := make([]float64, quantity)
+	ret := make([]float32, quantity)
 	for i := 0; i < quantity; i++ {
 		ret[i] = arr[rand.Intn(len(arr))]
 	}
