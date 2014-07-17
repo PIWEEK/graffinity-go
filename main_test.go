@@ -38,7 +38,7 @@ func TestBasicCalculation(t *testing.T) {
 		"languages": languagesFunc,
 	}
 
-	affinityFunc := func(x []float64) float64 { return genderFunc(x) + 3.5*ageFunc(x) + 0.1*languagesFunc(x) }
+	affinityFunc := "gender_func(x) + 3.5*age_func(x) + 0.1*languages_func(x)"
 
 	g := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc}
 	results := g.calculate()
@@ -58,5 +58,3 @@ func TestBasicCalculation(t *testing.T) {
 		t.Error("Expected 4.317276211268162, got ", results["n2"]["n3"])
 	}
 }
-
-
