@@ -3,6 +3,7 @@ package main
 
 import "runtime"
 import "fmt"
+import "time"
 
 type graffinityfunc func(x []float64) float64
 
@@ -18,7 +19,7 @@ type Graffinity struct {
 	groupaffinityFunc string
 }
 
-func (g Graffinity) calculate() map[string]map[string]float64 {
+func (g Graffinity) calculate() map[string]map[string]map[string]float64 {
 	runtime.GOMAXPROCS(len(g.funcs))
 	//runtime.GOMAXPROCS(1)
 
@@ -40,61 +41,63 @@ func (g Graffinity) calculate() map[string]map[string]float64 {
 		nodenames = append(nodenames, n)
 	}
 
-	calculatedIsalotatedFuncs := make(map[string]map[string]map[string]float64)
+	t1 := time.Now()
 
-	var channels = make(map[string]chan map[string]map[string]float64, len(funcs))
+	var calculateFuncs = make(map[string]map[string]map[string]float64)
+	for _, n1 := range nodenames {
+		calculateFuncs[n1] = make(map[string]map[string]float64)
+		for _, n2 := range nodenames {
+			calculateFuncs[n1][n2] = make(map[string]float64)
+			for namefunc, _ := range funcs {
+				calculateFuncs[n1][n2][namefunc] = 0.0
+			}
+		}
+	}
 
+	t2 := time.Now()
+	fmt.Println("ElapsedTime in seconds:", t2.Sub(t1))
+
+	var channels = make(map[string]chan int, len(funcs))
+
+	//Create a different routine for each function
 	for namefunc, datafunc := range f {
-		ch := make(chan map[string]map[string]float64)
+		ch := make(chan int)
 		channels[namefunc] = ch
 		funcdef := funcs[namefunc]
-		go calculateisolatedfunc(namefunc, datafunc, funcdef, ch)
+		go calculateisolatedfunc(namefunc, datafunc, funcdef, &calculateFuncs, ch)
 		fmt.Println("Launching", namefunc)
 	}
 
+	//Wait all the routines to finish
 	for funcName, channel := range channels {
-		calculatedIsalotatedFuncs[funcName] = <-channel
-		fmt.Println("Finishing", funcName)
-
+		r := <-channel
+		fmt.Println("Finishing", funcName, r)
 	}
 
-	var ret = make(map[string]map[string]float64)
-	for i := 0; i < len(nodenames); i++ {
-		nodename := nodenames[i]
-		n := map[string]float64{
-			nodename: 0.0,
-		}
-		ret[nodename] = n
-		for i := 0; i < len(nodenames); i++ {
-			othernodename := nodenames[i]
-			funcValues := make(map[string]float64)
-			for funcName, _ := range funcs {
-				funcValues[funcName] = calculatedIsalotatedFuncs[funcName][nodename][othernodename]
-			}
-			ret[nodename][othernodename] = affinityFunc(funcValues)
+	t3 := time.Now()
+	fmt.Println("ElapsedTime in seconds:", t3.Sub(t2))
+
+	for _, n1 := range nodenames {
+		for _, n2 := range nodenames {
+			calculateFuncs[n1][n2]["total"] = affinityFunc(calculateFuncs[n1][n2])
 		}
 	}
 
-	return ret
+	t4 := time.Now()
+	fmt.Println("ElapsedTime in seconds:", t4.Sub(t3))
+	return calculateFuncs
 }
 
-func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graffinityfunc, ch chan map[string]map[string]float64) {
-	var nodenames = make([]string, len(datafunc))
-	var nodedata = make([]float64, len(datafunc))
-
-	for _, data := range datafunc {
-		nodenames = append(nodenames, data.name)
-		nodedata = append(nodedata, data.data...)
-	}
-
-	ret := make(map[string]map[string]float64)
-	for _, n1 := range datafunc {
-		ret[n1.name] = make(map[string]float64)
-		for _, n2 := range datafunc {
-			values := append(n1.data, n2.data...)
-			ret[n1.name][n2.name] = funcdef(values)
+func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graffinityfunc, calculatedIsalotatedFuncsRef *map[string]map[string]map[string]float64, ch chan int) {
+	calculateFuncs := *calculatedIsalotatedFuncsRef
+	for i := 0; i < len(datafunc); i++ {
+		for j := i; j < len(datafunc); j++ {
+			n1 := datafunc[i]
+			n2 := datafunc[j]
+			val := funcdef(append(n1.data, n2.data...))
+			calculateFuncs[n1.name][n2.name][namefunc] = val
+			calculateFuncs[n2.name][n1.name][namefunc] = val
 		}
-
 	}
-	ch <- ret
+	ch <- 1
 }

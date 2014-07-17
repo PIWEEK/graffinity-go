@@ -45,13 +45,13 @@ func TestBasicCalculation(t *testing.T) {
 	g := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc}
 	results := g.calculate()
 
-	if results["n1"]["n2"] != 4.3478260869565215 {
-		t.Error("n1 n2 Expected 4.3478260869565215, got ", results["n1"]["n2"])
+	if results["n1"]["n2"]["total"] != 4.3478260869565215 {
+		t.Error("n1 n2 Expected 4.3478260869565215, got ", results["n1"]["n2"]["total"])
 	}
-	if results["n2"]["n1"] != 4.3478260869565215 {
-		t.Error("n2 n1 Expected 4.3478260869565215, got ", results["n2"]["n1"])
+	if results["n2"]["n1"]["total"] != 4.3478260869565215 {
+		t.Error("n2 n1 Expected 4.3478260869565215, got ", results["n2"]["n1"]["total"])
 	}
-	if results["n2"]["n3"] != 4.517241379310345 {
-		t.Error("n2 n3 Expected 4.517241379310345, got ", results["n2"]["n3"])
+	if results["n2"]["n3"]["total"] != 4.517241379310345 {
+		t.Error("n2 n3 Expected 4.517241379310345, got ", results["n2"]["n3"]["total"])
 	}
 }
