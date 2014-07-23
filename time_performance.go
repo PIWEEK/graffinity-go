@@ -3,7 +3,8 @@ package main
 import "fmt"
 import "math"
 import "time"
-import "runtime"
+
+//import "runtime"
 
 var genderchoices = []float32{1, 2}
 var agechoices = Range(18, 70)
@@ -62,9 +63,9 @@ func datagenerator(n int) map[string]map[string][]float32 {
 
 func main() {
 	fmt.Println("Creating sample data")
-	data := datagenerator(2001)
+	data := datagenerator(100001)
 
-	startTime := time.Now()
+	//startTime := time.Now()
 
 	genderFunc := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
 	ageFunc := func(x []float32) float32 { return float32(math.Abs(float64(Mean(x)-Stdev(x))) / float64(Mean(x))) }
@@ -132,33 +133,38 @@ func main() {
 			dictValues["skill09"] + dictValues["skill10"] + dictValues["guilds"]
 	}
 
-	g := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc, groupaffinityFunc: groupaffinityFunc}
+	/*
+		g := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc, groupaffinityFunc: groupaffinityFunc}
+		results := g.calculate()
+		fmt.Println("[n1][n18]", results["n1"]["n18"], "[n18][n1]", results["n18"]["n1"])
 
-	results := g.calculate()
-	fmt.Println("[n1][n18]", results["n1"]["n18"], "[n18][n1]", results["n18"]["n1"])
+		memstats := new(runtime.MemStats)
+		runtime.ReadMemStats(memstats)
+		fmt.Println("memstats before GC: bytes =", memstats.HeapAlloc, "footprint =",
+			memstats.Sys)
 
-	memstats := new(runtime.MemStats)
-	runtime.ReadMemStats(memstats)
-	fmt.Println("memstats before GC: bytes =", memstats.HeapAlloc, "footprint =",
-		memstats.Sys)
-
+	*/
 	endTime := time.Now()
-	fmt.Println("ElapsedTime in seconds:", endTime.Sub(startTime))
+	//fmt.Println("ElapsedTime in seconds:", endTime.Sub(startTime))
 
+	g2 := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc, groupaffinityFunc: groupaffinityFunc}
 	startTime2 := time.Now()
 	fmt.Println("ElapsedTime in seconds:", startTime2.Sub(endTime))
 	fmt.Println("---------------> Launching for node n1")
-	g.calculatefornode("n1")
+	r := g2.calculatefornode("n1")
+	fmt.Println("n1 n1000", r.get("n1", "n1000"), r.get("n1000", "n1"))
 
 	endTime2 := time.Now()
 	fmt.Println("ElapsedTime in seconds:", endTime2.Sub(startTime2))
 
-	startTime3 := time.Now()
-	fmt.Println("ElapsedTime in seconds:", endTime2.Sub(endTime))
-	fmt.Println("----------------> Launching for group n1 n2 n3")
-	g.calculateforgroup([]string{"n1", "n2", "n3"})
+	/*
+		g3 := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc, groupaffinityFunc: groupaffinityFunc}
+		startTime3 := time.Now()
+		fmt.Println("ElapsedTime in seconds:", endTime2.Sub(endTime))
+		fmt.Println("----------------> Launching for group n1 n2 n3")
+		g3.calculateforgroup([]string{"n1", "n2", "n3"})
 
-	endTime3 := time.Now()
-	fmt.Println("ElapsedTime in seconds:", endTime3.Sub(startTime3))
-
+		endTime3 := time.Now()
+		fmt.Println("ElapsedTime in seconds:", endTime3.Sub(startTime3))
+	*/
 }

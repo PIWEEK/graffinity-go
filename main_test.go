@@ -52,21 +52,21 @@ func TestBasicCalculation(t *testing.T) {
 	results := g.calculate()
 	fmt.Println("results", results["n1"])
 
-	if results["n1"]["n2"]["total"] != 4.347826 {
-		t.Error("n1 n2 Expected 4.347826, got ", results["n1"]["n2"]["total"])
+	if results.get("n1", "n2") != 4.347826 {
+		t.Error("n1 n2 Expected 4.347826, got ", results.get("n1", "n2"))
 	}
-	if results["n2"]["n1"]["total"] != 4.347826 {
-		t.Error("n2 n1 Expected 4.347826, got ", results["n2"]["n1"]["total"])
+	if results.get("n2", "n1") != 4.347826 {
+		t.Error("n2 n1 Expected 4.347826, got ", results.get("n2", "n1"))
 	}
-	if results["n2"]["n3"]["total"] != 4.5172415 {
-		t.Error("n2 n3 Expected 4.5172415, got ", results["n2"]["n3"]["total"])
+	if results.get("n2", "n3") != 4.5172415 {
+		t.Error("n2 n3 Expected 4.5172415, got ", results.get("n2", "n3"))
 	}
 	g2 := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc, groupaffinityFunc: groupaffinityFunc}
 	results2 := g2.calculatefornode("n1")
 	fmt.Println("results2", results2["n1"])
 
 	if results2["n1"]["n2"]["total"] != 4.347826 {
-		t.Error("n1 n2 Expected 4.347826, got ", results2["n1"]["n2"]["total"])
+		t.Error("n1 n2 Expected 4.347826, got ", results2.get("n1", "n2"))
 	}
 	g3 := Graffinity{data: data, funcs: funcs, affinityFunc: affinityFunc, groupaffinityFunc: groupaffinityFunc}
 	results3 := g3.calculateforgroup([]string{"n1", "n2", "n3"})

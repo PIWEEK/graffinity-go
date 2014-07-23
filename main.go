@@ -19,18 +19,28 @@ type Graffinity struct {
 	groupaffinityFunc func(map[string]float32) float32
 }
 
-// calculate functions
+type GraffinityResult map[string]map[string]map[string]float32
 
-func (g Graffinity) calculate() map[string]map[string]map[string]float32 {
+func (g GraffinityResult) get(node1, node2 string) float32 {
+	if val, ok := g[node1][node2]["total"]; ok {
+		return val
+	}
+	return g[node2][node1]["total"]
+}
+
+// calculate functions
+func (g Graffinity) calculate() GraffinityResult {
 
 	nodenames, funcs, affinityFunc, _, f, _ := g.init()
 
 	t1 := time.Now()
 
 	var calculateFuncs = make(map[string]map[string]map[string]float32)
-	for _, n1 := range nodenames {
+	for i := 0; i < len(nodenames); i++ {
+		n1 := nodenames[i]
 		calculateFuncs[n1] = make(map[string]map[string]float32)
-		for _, n2 := range nodenames {
+		for j := i; j < len(nodenames); j++ {
+			n2 := nodenames[j]
 			calculateFuncs[n1][n2] = make(map[string]float32)
 			for namefunc, _ := range funcs {
 				calculateFuncs[n1][n2][namefunc] = 0.0
@@ -63,7 +73,11 @@ func (g Graffinity) calculate() map[string]map[string]map[string]float32 {
 
 	for _, n1 := range nodenames {
 		for _, n2 := range nodenames {
-			calculateFuncs[n1][n2]["total"] = affinityFunc(calculateFuncs[n1][n2])
+			if _, ok := calculateFuncs[n1][n2]; ok {
+				calculateFuncs[n1][n2]["total"] = affinityFunc(calculateFuncs[n1][n2])
+			} else {
+				calculateFuncs[n2][n1]["total"] = affinityFunc(calculateFuncs[n2][n1])
+			}
 		}
 	}
 	t4 := time.Now()
@@ -113,7 +127,7 @@ func (g Graffinity) calculateforgroup(nodegroup []string) float32 {
 
 }
 
-func (g Graffinity) calculatefornode(nodename string) map[string]map[string]map[string]float32 {
+func (g Graffinity) calculatefornode(nodename string) GraffinityResult {
 
 	nodenames, funcs, affinityFunc, _, f, mynodedata := g.init(nodename)
 
@@ -183,8 +197,11 @@ func calculateisolatedfunc(namefunc string, datafunc []NodeAndData, funcdef graf
 			n1 := datafunc[i]
 			n2 := datafunc[j]
 			val := funcdef(append(n1.data, n2.data...))
-			calculateFuncs[n1.name][n2.name][namefunc] = val
-			calculateFuncs[n2.name][n1.name][namefunc] = val
+			if _, ok := calculateFuncs[n1.name][n2.name][namefunc]; ok {
+				calculateFuncs[n1.name][n2.name][namefunc] = val
+			} else {
+				calculateFuncs[n2.name][n1.name][namefunc] = val
+			}
 		}
 	}
 	ch <- 1
